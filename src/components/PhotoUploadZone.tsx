@@ -38,7 +38,7 @@ export default function PhotoUploadZone({
   maxFiles = 10,
   maxFileSizeMb = 25,
   allowVideos = true,
-  coupleNames = 'Sarah & Michael',
+  coupleNames = 'Brunthavan & Shibaani Surudisya',
 }: PhotoUploadZoneProps) {
   const [selectedFiles, setSelectedFiles] = useState<FilePreviewItem[]>([]);
   const [guestName, setGuestName] = useState('');

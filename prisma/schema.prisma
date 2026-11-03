@@ -12,8 +12,8 @@ datasource db {
 model WeddingConfig {
   id                 String   @id @default("default")
   weddingTitle       String   @default("Our Wedding Memories")
-  coupleNames        String   @default("Sarah & Michael")
-  weddingDate        String   @default("2026-10-24")
+  coupleNames        String   @default("Brunthavan & Shibaani Surudisya")
+  weddingDate        String   @default("November 28, 2026")
   venue              String   @default("Grand Chateau Garden Estate")
   welcomeMessage     String   @default("Thank you for being here with us on our most special day. Please share all the candid moments, smiles, and celebrations you capture!")
   allowVideoUploads  Boolean  @default(false)

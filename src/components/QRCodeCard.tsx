@@ -11,7 +11,7 @@ interface QRCodeCardProps {
 
 export default function QRCodeCard({
   uploadUrl = 'http://localhost:3000/upload',
-  coupleNames = 'Sarah & Michael',
+  coupleNames = 'Brunthavan & Shibaani Surudisya',
 }: QRCodeCardProps) {
   const [activeUrl, setActiveUrl] = useState(uploadUrl);
   const [copied, setCopied] = useState(false);

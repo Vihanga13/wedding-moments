@@ -2,33 +2,31 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('Seeding initial wedding configuration...');
+  console.log('Seeding / updating wedding configuration...');
   
-  const existingConfig = await prisma.weddingConfig.findUnique({
-    where: { id: 'default' }
+  await prisma.weddingConfig.upsert({
+    where: { id: 'default' },
+    update: {
+      coupleNames: 'Brunthavan & Shibaani Surudisya',
+      weddingDate: 'November 28, 2026',
+      venue: '',
+    },
+    create: {
+      id: 'default',
+      weddingTitle: 'Our Wedding Memories',
+      coupleNames: 'Brunthavan & Shibaani Surudisya',
+      weddingDate: 'November 28, 2026',
+      venue: '',
+      welcomeMessage: 'Thank you for celebrating with us! Every photo you take captures a memory we will treasure forever. Please upload your candid pictures from the ceremony and reception.',
+      allowVideoUploads: true,
+      maxFilesPerUpload: 10,
+      maxFileSizeMb: 25,
+      isUploadActive: true,
+      isGalleryPublic: true,
+      themePrimaryColor: '#BE9F58',
+    }
   });
-
-  if (!existingConfig) {
-    await prisma.weddingConfig.create({
-      data: {
-        id: 'default',
-        weddingTitle: 'Our Wedding Moments',
-        coupleNames: 'Sarah & Michael',
-        weddingDate: 'October 24, 2026',
-        venue: 'Grand Chateau Garden Estate, Florence',
-        welcomeMessage: 'Thank you for celebrating with us! Every photo you take captures a memory we will treasure forever. Please upload your candid pictures from the ceremony and reception.',
-        allowVideoUploads: true,
-        maxFilesPerUpload: 10,
-        maxFileSizeMb: 25,
-        isUploadActive: true,
-        isGalleryPublic: true,
-        themePrimaryColor: '#BE9F58',
-      }
-    });
-    console.log('Default wedding configuration created.');
-  } else {
-    console.log('Wedding configuration already exists.');
-  }
+  console.log('Wedding configuration updated for Brunthavan & Shibaani Surudisya.');
 }
 
 main()

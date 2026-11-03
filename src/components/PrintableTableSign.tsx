@@ -87,10 +87,10 @@ export default function PrintableTableSign({ config, uploadUrl }: PrintableTable
             <Heart className="w-4 h-4 text-gold-600 fill-gold-400/20" />
           </div>
           <h1 className="font-script-wedding text-4xl sm:text-5xl text-stoneDark font-normal">
-            {config.coupleNames || 'Sarah & Michael'}
+            {config.coupleNames || 'Brunthavan & Shibaani Surudisya'}
           </h1>
           <p className="font-serif-wedding text-xs sm:text-sm tracking-widest uppercase text-gold-700 font-medium">
-            {config.weddingDate || 'October 24, 2026'}
+            {config.weddingDate || 'November 28, 2026'}
           </p>
           {config.venue && (
             <p className="font-sans text-[11px] text-stoneDark/50 tracking-wide uppercase">

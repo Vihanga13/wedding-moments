@@ -32,13 +32,13 @@ export default async function HomePage() {
         {/* Date badge */}
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gold-100/80 border border-gold-300/60 text-gold-800 text-xs font-sans tracking-widest uppercase shadow-sm">
           <Heart className="w-3.5 h-3.5 text-gold-600 fill-gold-500/20" />
-          <span>{config.weddingDate || 'October 24, 2026'}</span>
+          <span>{config.weddingDate || 'November 28, 2026'}</span>
         </div>
 
         {/* Wedding Title & Couple Names */}
         <div className="space-y-3">
           <h1 className="font-script-wedding text-5xl sm:text-7xl lg:text-8xl text-stoneDark font-normal">
-            {config.coupleNames || 'Sarah & Michael'}
+            {config.coupleNames || 'Brunthavan & Shibaani Surudisya'}
           </h1>
           <p className="font-serif-wedding text-2xl sm:text-3xl tracking-wide text-gold-700 font-medium">
             {config.weddingTitle || 'Our Wedding Memories'}
