@@ -1,0 +1,49 @@
+// Prisma schema for Wedding Moments
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model WeddingConfig {
+  id                 String   @id @default("default")
+  weddingTitle       String   @default("Our Wedding Memories")
+  coupleNames        String   @default("Sarah & Michael")
+  weddingDate        String   @default("2026-10-24")
+  venue              String   @default("Grand Chateau Garden Estate")
+  welcomeMessage     String   @default("Thank you for being here with us on our most special day. Please share all the candid moments, smiles, and celebrations you capture!")
+  allowVideoUploads  Boolean  @default(false)
+  allowGuestDownloads Boolean @default(true)
+  maxFilesPerUpload  Int      @default(10)
+  maxFileSizeMb      Int      @default(25)
+  isUploadActive     Boolean  @default(true)
+  isGalleryPublic    Boolean  @default(true)
+  themePrimaryColor  String   @default("#BE9F58")
+  updatedAt          DateTime @updatedAt
+  createdAt          DateTime @default(now())
+}
+
+model Photo {
+  id                 String   @id @default(cuid())
+  googleDriveFileId  String?
+  originalFileName   String
+  sanitizedFileName  String
+  mimeType           String
+  fileSizeBytes      Int
+  width              Int?
+  height             Int?
+  blurDataUrl        String?
+  guestName          String?
+  guestCaption       String?
+  storageProvider    String   @default("local") // "google_drive" or "local"
+  storageKey         String?
+  status             String   @default("APPROVED") // "APPROVED", "PENDING", "HIDDEN"
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([status, createdAt])
+}
