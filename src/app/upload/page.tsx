@@ -33,7 +33,7 @@ export default async function UploadPage() {
           className="flex items-center gap-1.5 text-xs font-medium text-gold-700 hover:text-gold-900 transition-colors"
         >
           <ImageIcon className="w-4 h-4" />
-          View All Photos
+          View Your Uploads
         </Link>
       </div>
 
@@ -55,7 +55,7 @@ export default async function UploadPage() {
               className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-stoneDark text-ivory-50 text-sm font-medium hover:bg-black transition-all"
             >
               <ImageIcon className="w-4 h-4 text-gold-400" />
-              Visit Photo Gallery
+              View Your Uploads
             </Link>
           </div>
         </div>

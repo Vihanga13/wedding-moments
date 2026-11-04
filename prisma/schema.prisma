@@ -39,6 +39,7 @@ model Photo {
   blurDataUrl        String?
   guestName          String?
   guestCaption       String?
+  uploaderToken      String?
   storageProvider    String   @default("local") // "google_drive" or "local"
   storageKey         String?
   status             String   @default("APPROVED") // "APPROVED", "PENDING", "HIDDEN"
@@ -46,4 +47,5 @@ model Photo {
   updatedAt          DateTime @updatedAt
 
   @@index([status, createdAt])
+  @@index([uploaderToken])
 }

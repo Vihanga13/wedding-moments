@@ -16,6 +16,7 @@ import {
   Eye,
 } from 'lucide-react';
 import { UploadApiResponse } from '@/types';
+import { getOrCreateUploaderToken } from '@/lib/uploader-token';
 
 interface FilePreviewItem {
   id: string;
@@ -220,6 +221,11 @@ export default function PhotoUploadZone({
           formData.append('guestCaption', guestCaption.trim());
         }
 
+        const token = getOrCreateUploaderToken();
+        if (token) {
+          formData.append('uploaderToken', token);
+        }
+
         const res = await fetch('/api/photos/upload', {
           method: 'POST',
           body: formData,
@@ -307,7 +313,7 @@ export default function PhotoUploadZone({
               className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-stoneDark text-ivory-50 text-sm font-medium hover:bg-black transition-all shadow-md"
             >
               <Eye className="w-4 h-4 text-gold-400" />
-              View Gallery
+              View Your Uploads
             </Link>
 
             <button

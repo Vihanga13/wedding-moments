@@ -13,9 +13,11 @@ import {
   Sparkles,
   AlertCircle,
   Download,
+  Lock,
 } from 'lucide-react';
 import { PhotoData, GalleryResponse } from '@/types';
 import ImageLightbox from './ImageLightbox';
+import { getOrCreateUploaderToken } from '@/lib/uploader-token';
 
 export default function GalleryGrid() {
   const [photos, setPhotos] = useState<PhotoData[]>([]);
@@ -45,15 +47,19 @@ export default function GalleryGrid() {
     setLoading(true);
     setError(null);
     try {
+      const token = getOrCreateUploaderToken();
       const params = new URLSearchParams({
         page: String(page),
         limit: '24',
         sort: sortOrder,
+        ...(token ? { uploaderToken: token } : {}),
         ...(debouncedSearch ? { guest: debouncedSearch } : {}),
       });
 
-      const res = await fetch(`/api/photos?${params.toString()}`);
-      if (!res.ok) throw new Error('Failed to load gallery photos.');
+      const res = await fetch(`/api/photos?${params.toString()}`, {
+        headers: token ? { 'x-uploader-token': token } : {},
+      });
+      if (!res.ok) throw new Error('Failed to load your uploaded photos.');
       const data: GalleryResponse = await res.json();
       setPhotos(data.photos);
       setTotalPages(data.totalPages);
@@ -75,11 +81,19 @@ export default function GalleryGrid() {
       {/* Header & Filter Controls */}
       <div className="flex flex-col md:flex-row items-center justify-between gap-4 pb-6 border-b border-gold-200/60">
         <div>
-          <h2 className="font-serif-wedding text-3xl sm:text-4xl text-stoneDark font-medium">
-            Wedding Photo Gallery
-          </h2>
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <h2 className="font-serif-wedding text-3xl sm:text-4xl text-stoneDark font-medium">
+              Your Uploaded Moments
+            </h2>
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-sans font-medium bg-gold-100/80 text-gold-800 border border-gold-200/60">
+              <Lock className="w-3 h-3 text-gold-700" />
+              Private to this device
+            </span>
+          </div>
           <p className="font-sans text-xs sm:text-sm text-stoneDark/60 mt-1">
-            {totalPhotos} candid moment{totalPhotos === 1 ? '' : 's'} shared by family & friends
+            {totalPhotos === 0
+              ? 'Photos you capture and upload from this phone or browser will appear here.'
+              : `You have uploaded ${totalPhotos} photo${totalPhotos === 1 ? '' : 's'} to Brunthavan & Shibaani's album.`}
           </p>
         </div>
 
@@ -154,10 +168,10 @@ export default function GalleryGrid() {
             <Camera className="w-8 h-8" />
           </div>
           <h3 className="font-serif-wedding text-2xl font-medium text-stoneDark">
-            No Photos Shared Yet
+            No Photos Uploaded Yet
           </h3>
           <p className="font-sans text-xs text-stoneDark/60 max-w-sm mx-auto">
-            Be the very first guest to capture and upload a romantic wedding moment!
+            You haven&apos;t shared any photos from this device yet. Any candid moments you snap and upload will appear here privately and save to the couple&apos;s album!
           </p>
           <div className="pt-2">
             <Link
@@ -165,7 +179,7 @@ export default function GalleryGrid() {
               className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-gradient-to-r from-gold-500 to-gold-600 text-white text-sm font-medium shadow-soft hover:shadow-glow hover:brightness-105 transition-all"
             >
               <Camera className="w-4 h-4" />
-              Upload the First Photo
+              Upload Your First Photo
             </Link>
           </div>
         </div>

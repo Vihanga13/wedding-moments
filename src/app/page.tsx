@@ -78,7 +78,7 @@ export default async function HomePage() {
             className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-white border border-gold-300 text-stoneDark font-serif-wedding text-xl tracking-wide font-medium hover:bg-gold-50/60 shadow-sm transition-all"
           >
             <ImageIcon className="w-5 h-5 text-gold-600" />
-            View Wedding Gallery
+            View Your Uploads
           </Link>
         </div>
 

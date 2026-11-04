@@ -27,6 +27,7 @@ export interface PhotoData {
   blurDataUrl?: string | null;
   guestName?: string | null;
   guestCaption?: string | null;
+  uploaderToken?: string | null;
   storageProvider?: string;
   status: 'APPROVED' | 'PENDING' | 'HIDDEN';
   createdAt: string;
