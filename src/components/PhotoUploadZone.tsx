@@ -130,6 +130,66 @@ export default function PhotoUploadZone({
     setUploadProgress(0);
   }
 
+  // Client-side image optimization to prevent Netlify 6MB body limit & timeouts
+  async function compressImage(file: File): Promise<File> {
+    if (!file.type.startsWith('image/') || file.size < 1024 * 1024) {
+      return file;
+    }
+
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const MAX_DIM = 2400;
+          let width = img.width;
+          let height = img.height;
+
+          if (width > MAX_DIM || height > MAX_DIM) {
+            if (width > height) {
+              height = Math.round((height * MAX_DIM) / width);
+              width = MAX_DIM;
+            } else {
+              width = Math.round((width * MAX_DIM) / height);
+              height = MAX_DIM;
+            }
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            resolve(file);
+            return;
+          }
+
+          ctx.drawImage(img, 0, 0, width, height);
+          canvas.toBlob(
+            (blob) => {
+              if (!blob || blob.size >= file.size) {
+                resolve(file);
+              } else {
+                const safeName = file.name.replace(/\.[^.]+$/, '.jpg');
+                const compressed = new File([blob], safeName, {
+                  type: 'image/jpeg',
+                  lastModified: Date.now(),
+                });
+                resolve(compressed);
+              }
+            },
+            'image/jpeg',
+            0.85
+          );
+        };
+        img.onerror = () => resolve(file);
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = () => resolve(file);
+      reader.readAsDataURL(file);
+    });
+  }
+
   async function handleUpload() {
     const validFiles = selectedFiles.filter((item) => !item.error);
 
@@ -140,54 +200,87 @@ export default function PhotoUploadZone({
 
     setIsUploading(true);
     setGeneralError(null);
-    setUploadProgress(20);
+    setUploadProgress(10);
 
-    const formData = new FormData();
-    validFiles.forEach((item) => {
-      formData.append('files', item.file);
-    });
+    const allUploadedResults: any[] = [];
+    let totalSuccess = 0;
+    let totalFailed = 0;
 
-    if (guestName.trim()) {
-      formData.append('guestName', guestName.trim());
-    }
-    if (guestCaption.trim()) {
-      formData.append('guestCaption', guestCaption.trim());
-    }
+    for (let i = 0; i < validFiles.length; i++) {
+      const item = validFiles[i];
+      try {
+        const fileToUpload = await compressImage(item.file);
+        const formData = new FormData();
+        formData.append('files', fileToUpload);
 
-    try {
-      setUploadProgress(45);
+        if (guestName.trim()) {
+          formData.append('guestName', guestName.trim());
+        }
+        if (guestCaption.trim()) {
+          formData.append('guestCaption', guestCaption.trim());
+        }
 
-      const res = await fetch('/api/photos/upload', {
-        method: 'POST',
-        body: formData,
-      });
+        const res = await fetch('/api/photos/upload', {
+          method: 'POST',
+          body: formData,
+        });
 
-      setUploadProgress(85);
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || 'Failed to upload photos.');
-      }
-
-      setUploadProgress(100);
-      setUploadResponse(data);
-
-      if (data.successCount > 0) {
-        // Trigger romantic confetti celebration!
-        confetti({
-          particleCount: 120,
-          spread: 70,
-          origin: { y: 0.6 },
-          colors: ['#D1B77B', '#EFC2C7', '#FAF8F5', '#BE9F58'],
+        const data = await res.json();
+        if (res.ok && data.successCount > 0) {
+          totalSuccess += data.successCount;
+          allUploadedResults.push(...data.uploaded);
+        } else {
+          totalFailed++;
+          allUploadedResults.push({
+            id: '',
+            originalFileName: item.file.name,
+            fileSizeBytes: item.file.size,
+            status: 'failed',
+            error: data.error || 'Failed to upload photo',
+          });
+        }
+      } catch (err: any) {
+        totalFailed++;
+        allUploadedResults.push({
+          id: '',
+          originalFileName: item.file.name,
+          fileSizeBytes: item.file.size,
+          status: 'failed',
+          error: err.message || 'Upload error',
         });
       }
-    } catch (err: any) {
-      console.error('Upload error:', err);
-      setGeneralError(err.message || 'An unexpected error occurred while uploading. Please try again.');
-    } finally {
-      setIsUploading(false);
+
+      setUploadProgress(Math.round(((i + 1) / validFiles.length) * 90));
     }
+
+    setUploadProgress(100);
+
+    const finalResponse = {
+      success: totalSuccess > 0,
+      message:
+        totalSuccess > 0
+          ? `Successfully uploaded ${totalSuccess} photo${totalSuccess === 1 ? '' : 's'}!`
+          : 'Failed to upload photos.',
+      uploaded: allUploadedResults,
+      successCount: totalSuccess,
+      failedCount: totalFailed,
+    };
+
+    setUploadResponse(finalResponse);
+
+    if (totalSuccess > 0) {
+      // Trigger romantic confetti celebration!
+      confetti({
+        particleCount: 120,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#D1B77B', '#EFC2C7', '#FAF8F5', '#BE9F58'],
+      });
+    } else {
+      setGeneralError(allUploadedResults[0]?.error || 'Failed to upload photos. Please try again.');
+    }
+
+    setIsUploading(false);
   }
 
   return (

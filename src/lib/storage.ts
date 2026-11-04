@@ -107,10 +107,14 @@ export async function storeOriginalFile(
     } catch (driveErr) {
       console.error('Google Drive upload failed, checking local fallback:', driveErr);
       const fallbackAllowed = process.env.ENABLE_LOCAL_STORAGE_FALLBACK === 'true';
-      if (!fallbackAllowed) {
+      if (!fallbackAllowed || isServerless) {
         throw new Error(`Google Drive upload failed: ${(driveErr as Error).message}`);
       }
     }
+  } else if (isServerless) {
+    throw new Error(
+      'Google Drive is not configured on Netlify. Please set GOOGLE_REFRESH_TOKEN and GOOGLE_DRIVE_FOLDER_ID in Netlify Site Configuration > Environment Variables.'
+    );
   }
 
   // Local storage fallback
