@@ -236,7 +236,7 @@ export default function PhotoUploadZone({
             originalFileName: item.file.name,
             fileSizeBytes: item.file.size,
             status: 'failed',
-            error: data.error || 'Failed to upload photo',
+            error: data.uploaded?.[0]?.error || data.error || 'Failed to upload photo',
           });
         }
       } catch (err: any) {

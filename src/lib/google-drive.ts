@@ -6,18 +6,28 @@ export const DRIVE_SCOPES = [
   'https://www.googleapis.com/auth/drive.file',
 ];
 
+export function cleanEnvVal(val?: string): string {
+  if (!val) return '';
+  let clean = val.trim();
+  if ((clean.startsWith('"') && clean.endsWith('"')) || (clean.startsWith("'") && clean.endsWith("'"))) {
+    clean = clean.slice(1, -1).trim();
+  }
+  return clean;
+}
+
 export function cleanFolderId(rawId?: string): string | undefined {
   if (!rawId) return undefined;
-  const match = rawId.match(/folders\/([a-zA-Z0-9_-]+)/);
+  const trimmed = cleanEnvVal(rawId);
+  const match = trimmed.match(/folders\/([a-zA-Z0-9_-]+)/);
   if (match) return match[1];
-  return rawId.trim();
+  return trimmed || undefined;
 }
 
 export function isGoogleDriveConfigured(): boolean {
-  const clientId = process.env.GOOGLE_CLIENT_ID;
-  const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
-  const refreshToken = process.env.GOOGLE_REFRESH_TOKEN;
-  const folderId = process.env.GOOGLE_DRIVE_FOLDER_ID;
+  const clientId = cleanEnvVal(process.env.GOOGLE_CLIENT_ID);
+  const clientSecret = cleanEnvVal(process.env.GOOGLE_CLIENT_SECRET);
+  const refreshToken = cleanEnvVal(process.env.GOOGLE_REFRESH_TOKEN);
+  const folderId = cleanFolderId(process.env.GOOGLE_DRIVE_FOLDER_ID);
 
   return !!(
     clientId &&
@@ -30,8 +40,8 @@ export function isGoogleDriveConfigured(): boolean {
 }
 
 export function getOAuth2Client() {
-  const clientId = process.env.GOOGLE_CLIENT_ID;
-  const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+  const clientId = cleanEnvVal(process.env.GOOGLE_CLIENT_ID);
+  const clientSecret = cleanEnvVal(process.env.GOOGLE_CLIENT_SECRET);
 
   if (!clientId || !clientSecret) {
     throw new Error('Google OAuth Client ID and Secret must be configured in environment variables.');
@@ -39,7 +49,7 @@ export function getOAuth2Client() {
 
   const oauth2Client = new google.auth.OAuth2(clientId, clientSecret);
 
-  const refreshToken = process.env.GOOGLE_REFRESH_TOKEN;
+  const refreshToken = cleanEnvVal(process.env.GOOGLE_REFRESH_TOKEN);
   if (refreshToken) {
     oauth2Client.setCredentials({
       refresh_token: refreshToken,
