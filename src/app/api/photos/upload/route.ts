@@ -74,6 +74,7 @@ export async function POST(req: NextRequest) {
 
     for (const file of files) {
       const originalFileName = file.name || 'wedding_photo.jpg';
+      let photoId: string | null = null;
 
       try {
         const arrayBuffer = await file.arrayBuffer();
@@ -104,61 +105,59 @@ export async function POST(req: NextRequest) {
         const sanitized = sanitizeFileName(originalFileName);
         const storageFileName = generateUniqueStorageName(sanitized);
 
-        let photoId: string | null = null;
-        try {
-          // Pre-create database entry to get a unique cuid photo ID
-          const photo = await prisma.photo.create({
-            data: {
-              originalFileName: sanitized,
-              sanitizedFileName: storageFileName,
-              mimeType,
-              fileSizeBytes: buffer.length,
-              guestName,
-              guestCaption,
-              uploaderToken,
-              storageProvider: 'local', // updated below
-              status: 'APPROVED',
-            },
-          });
-          photoId = photo.id;
-
-          // Store original to Google Drive or local fallback with Sharp preview generation
-          const stored = await storeOriginalFile(buffer, storageFileName, mimeType, photo.id);
-
-          // Update photo record with dimensions, blur URL, and Drive file ID
-          await prisma.photo.update({
-            where: { id: photo.id },
-            data: {
-              googleDriveFileId: stored.driveFileId || null,
-              storageProvider: stored.provider,
-              storageKey: stored.storageKey,
-              width: stored.width || null,
-              height: stored.height || null,
-              blurDataUrl: stored.blurDataUrl || null,
-            },
-          });
-
-          successCount++;
-          results.push({
-            id: photo.id,
-            originalFileName,
+        // Pre-create database entry to get a unique cuid photo ID
+        const photo = await prisma.photo.create({
+          data: {
+            originalFileName: sanitized,
+            sanitizedFileName: storageFileName,
+            mimeType,
             fileSizeBytes: buffer.length,
-            status: 'success' as const,
-          });
-        } catch (fileErr: any) {
-          console.error(`Error processing file ${originalFileName}:`, fileErr);
-          if (photoId) {
-            await prisma.photo.delete({ where: { id: photoId } }).catch(() => {});
-          }
-          failedCount++;
-          results.push({
-            id: '',
-            originalFileName,
-            fileSizeBytes: 0,
-            status: 'failed' as const,
-            error: fileErr.message || 'Server error while storing photo',
-          });
+            guestName,
+            guestCaption,
+            uploaderToken,
+            storageProvider: 'local', // updated below
+            status: 'APPROVED',
+          },
+        });
+        photoId = photo.id;
+
+        // Store original to Google Drive or local fallback with Sharp preview generation
+        const stored = await storeOriginalFile(buffer, storageFileName, mimeType, photo.id);
+
+        // Update photo record with dimensions, blur URL, and Drive file ID
+        await prisma.photo.update({
+          where: { id: photo.id },
+          data: {
+            googleDriveFileId: stored.driveFileId || null,
+            storageProvider: stored.provider,
+            storageKey: stored.storageKey,
+            width: stored.width || null,
+            height: stored.height || null,
+            blurDataUrl: stored.blurDataUrl || null,
+          },
+        });
+
+        successCount++;
+        results.push({
+          id: photo.id,
+          originalFileName,
+          fileSizeBytes: buffer.length,
+          status: 'success' as const,
+        });
+      } catch (fileErr: any) {
+        console.error(`Error processing file ${originalFileName}:`, fileErr);
+        if (photoId) {
+          await prisma.photo.delete({ where: { id: photoId } }).catch(() => {});
         }
+        failedCount++;
+        results.push({
+          id: '',
+          originalFileName,
+          fileSizeBytes: 0,
+          status: 'failed' as const,
+          error: fileErr.message || 'Server error while storing photo',
+        });
+      }
     }
 
     return NextResponse.json({
