@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { headers } from 'next/headers';
 import { prisma } from '@/lib/prisma';
-import { Camera, Image as ImageIcon, Heart, Printer } from 'lucide-react';
+import { Camera, Heart, Printer } from 'lucide-react';
 import QRCodeCard from '@/components/QRCodeCard';
 import { getPublicUploadUrl } from '@/lib/qrcode';
 
@@ -63,22 +63,14 @@ export default async function HomePage() {
           </div>
         </div>
 
-        {/* Primary Call-to-Action Buttons */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+        {/* Primary Call-to-Action Button */}
+        <div className="flex items-center justify-center pt-4">
           <Link
             href="/upload"
-            className="w-full sm:w-auto flex items-center justify-center gap-2.5 px-8 py-4 rounded-full bg-gradient-to-r from-gold-500 via-gold-600 to-gold-500 text-white font-serif-wedding text-xl tracking-wide font-medium shadow-card hover:shadow-glow hover:brightness-105 active:scale-[0.99] transition-all group"
+            className="w-full sm:w-auto flex items-center justify-center gap-2.5 px-10 py-4 rounded-full bg-gradient-to-r from-gold-500 via-gold-600 to-gold-500 text-white font-serif-wedding text-xl tracking-wide font-medium shadow-card hover:shadow-glow hover:brightness-105 active:scale-[0.99] transition-all group"
           >
             <Camera className="w-5 h-5 group-hover:rotate-12 transition-transform" />
             Upload Your Photos
-          </Link>
-
-          <Link
-            href="/gallery"
-            className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-white border border-gold-300 text-stoneDark font-serif-wedding text-xl tracking-wide font-medium hover:bg-gold-50/60 shadow-sm transition-all"
-          >
-            <ImageIcon className="w-5 h-5 text-gold-600" />
-            View Your Uploads
           </Link>
         </div>
 

@@ -13,7 +13,6 @@ import {
   RefreshCw,
   Sparkles,
   Heart,
-  Eye,
 } from 'lucide-react';
 import { UploadApiResponse } from '@/types';
 import { getOrCreateUploaderToken } from '@/lib/uploader-token';
@@ -308,21 +307,20 @@ export default function PhotoUploadZone({
           </div>
 
           <div className="pt-2 flex flex-wrap items-center justify-center gap-4">
-            <Link
-              href="/gallery"
-              className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-stoneDark text-ivory-50 text-sm font-medium hover:bg-black transition-all shadow-md"
-            >
-              <Eye className="w-4 h-4 text-gold-400" />
-              View Your Uploads
-            </Link>
-
             <button
               onClick={clearAll}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-full bg-white border border-gold-300 text-stoneDark text-sm font-medium hover:bg-gold-50 transition-all"
+              className="flex items-center gap-2 px-8 py-3.5 rounded-full bg-gradient-to-r from-gold-500 via-gold-600 to-gold-500 text-white font-serif-wedding text-lg font-medium shadow-card hover:shadow-glow hover:brightness-105 active:scale-[0.99] transition-all"
             >
-              <Sparkles className="w-4 h-4 text-gold-600" />
-              Share More Photos
+              <Sparkles className="w-4 h-4" />
+              Upload More Photos
             </button>
+
+            <Link
+              href="/"
+              className="flex items-center gap-2 px-6 py-3.5 rounded-full bg-white border border-gold-300 text-stoneDark font-serif-wedding text-lg font-medium hover:bg-gold-50/60 shadow-sm transition-all"
+            >
+              Back to Home
+            </Link>
           </div>
         </div>
       )}
