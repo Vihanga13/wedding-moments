@@ -86,8 +86,10 @@ export default function PrintableTableSign({ config, uploadUrl }: PrintableTable
           <div className="w-8 h-8 rounded-full border border-gold-400 mx-auto flex items-center justify-center">
             <Heart className="w-4 h-4 text-gold-600 fill-gold-400/20" />
           </div>
-          <h1 className="font-script-wedding text-4xl sm:text-5xl text-stoneDark font-normal">
-            {config.coupleNames || 'Brunthavan & Shibaani Surudisya'}
+          <h1 className="font-script-wedding text-4xl sm:text-5xl text-stoneDark font-normal flex flex-col items-center justify-center leading-tight">
+            <span>Brunthavan</span>
+            <span className="text-2xl sm:text-3xl text-gold-600 my-0.5 font-normal select-none">&amp;</span>
+            <span>Shibaani Surudisya</span>
           </h1>
           <p className="font-serif-wedding text-xs sm:text-sm tracking-widest uppercase text-gold-700 font-medium">
             {config.weddingDate || 'November 28, 2026'}

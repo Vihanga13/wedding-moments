@@ -36,11 +36,15 @@ export default async function HomePage() {
         </div>
 
         {/* Wedding Title & Couple Names */}
-        <div className="space-y-3">
-          <h1 className="font-script-wedding text-5xl sm:text-7xl lg:text-8xl text-stoneDark font-normal">
-            {config.coupleNames || 'Brunthavan & Shibaani Surudisya'}
+        <div className="space-y-4">
+          <h1 className="font-script-wedding text-5xl sm:text-7xl lg:text-8xl text-stoneDark font-normal flex flex-col items-center justify-center leading-tight sm:leading-tight">
+            <span>Brunthavan</span>
+            <span className="text-3xl sm:text-5xl lg:text-6xl text-gold-600 my-0.5 sm:my-1 font-normal select-none">
+              &amp;
+            </span>
+            <span>Shibaani Surudisya</span>
           </h1>
-          <p className="font-serif-wedding text-2xl sm:text-3xl tracking-wide text-gold-700 font-medium">
+          <p className="font-serif-wedding text-2xl sm:text-3xl tracking-wide text-gold-700 font-medium pt-2">
             {config.weddingTitle || 'Our Wedding Memories'}
           </p>
           {config.venue && (
