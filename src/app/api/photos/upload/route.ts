@@ -13,10 +13,12 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(req: NextRequest) {
   try {
-    // 1. Abuse Protection & Rate Limiting
+    // 1. Abuse Protection & Rate Limiting (per-device token or IP for shared venue Wi-Fi)
     const clientIp = getClientIp(req.headers);
-    const maxPerMin = parseInt(process.env.RATE_LIMIT_MAX_REQUESTS_PER_MINUTE || '20', 10);
-    const rateCheck = checkRateLimit(clientIp, maxPerMin);
+    const deviceToken = req.headers.get('x-uploader-token')?.trim();
+    const rateLimitKey = deviceToken ? `dev_${deviceToken}` : clientIp;
+    const maxPerMin = parseInt(process.env.RATE_LIMIT_MAX_REQUESTS_PER_MINUTE || '60', 10);
+    const rateCheck = checkRateLimit(rateLimitKey, Math.max(maxPerMin, 60));
 
     if (!rateCheck.allowed) {
       return NextResponse.json(

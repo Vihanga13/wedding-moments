@@ -227,6 +227,7 @@ export default function PhotoUploadZone({
 
         const res = await fetch('/api/photos/upload', {
           method: 'POST',
+          headers: token ? { 'x-uploader-token': token } : {},
           body: formData,
         });
 
