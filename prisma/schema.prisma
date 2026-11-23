@@ -15,7 +15,7 @@ model WeddingConfig {
   coupleNames        String   @default("Brunthavan & Shibaani Surudisya")
   weddingDate        String   @default("November 28, 2026")
   venue              String   @default("Grand Chateau Garden Estate")
-  welcomeMessage     String   @default("Welcome to Our Wedding Celebration! ❤️\n\nYour presence made our day even more special! We’d love to see our beautiful moments through your eyes. 📸\n\nShare your photos and videos with us, and help us relive the love, laughter, and unforgettable memories.")
+  welcomeMessage     String   @default("Welcome to Our Wedding Celebration! ❤️\n\nYour presence made our day even more special! We’d love to see our beautiful moments through your eyes.\n\nShare your photos and videos with us, and help us relive the love, laughter, and unforgettable memories.")
   allowVideoUploads  Boolean  @default(false)
   allowGuestDownloads Boolean @default(true)
   maxFilesPerUpload  Int      @default(10)

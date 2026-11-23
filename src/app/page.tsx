@@ -1,9 +1,6 @@
 import Link from 'next/link';
-import { headers } from 'next/headers';
 import { prisma } from '@/lib/prisma';
-import { Camera, Heart, Printer } from 'lucide-react';
-import QRCodeCard from '@/components/QRCodeCard';
-import { getPublicUploadUrl } from '@/lib/qrcode';
+import { Heart } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,13 +14,6 @@ export default async function HomePage() {
       data: { id: 'default' },
     });
   }
-
-  // Detect live host on Netlify / production so QR code always opens the live site
-  const headerList = headers();
-  const host = headerList.get('x-forwarded-host') || headerList.get('host');
-  const proto = headerList.get('x-forwarded-proto') || 'https';
-  const dynamicOrigin = host && !host.includes('localhost') ? `${proto}://${host}` : undefined;
-  const uploadUrl = getPublicUploadUrl(dynamicOrigin);
 
   return (
     <div className="w-full flex flex-col items-center space-y-16 sm:space-y-24 py-8 sm:py-16 px-4 sm:px-6 lg:px-8">
@@ -73,27 +63,11 @@ export default async function HomePage() {
         <div className="flex items-center justify-center pt-4">
           <Link
             href="/upload"
-            className="w-full sm:w-auto flex items-center justify-center gap-2.5 px-10 py-4 rounded-full bg-gradient-to-r from-gold-500 via-gold-600 to-gold-500 text-white font-serif-wedding text-xl tracking-wide font-medium shadow-card hover:shadow-glow hover:brightness-105 active:scale-[0.99] transition-all group"
+            className="w-full sm:w-auto flex items-center justify-center px-10 py-4 rounded-full bg-gradient-to-r from-gold-500 via-gold-600 to-gold-500 text-white font-serif-wedding text-xl tracking-wide font-medium shadow-card hover:shadow-glow hover:brightness-105 active:scale-[0.99] transition-all"
           >
-            <Camera className="w-5 h-5 group-hover:rotate-12 transition-transform" />
             Upload Your Photos
           </Link>
         </div>
-
-        <div className="pt-2">
-          <Link
-            href="/print-sign"
-            className="inline-flex items-center gap-1.5 text-xs text-gold-700/80 hover:text-gold-900 font-sans transition-colors underline underline-offset-4"
-          >
-            <Printer className="w-3.5 h-3.5" />
-            Print QR stationery cards for guest tables
-          </Link>
-        </div>
-      </section>
-
-      {/* QR Code Card */}
-      <section className="w-full max-w-lg mx-auto flex justify-center">
-        <QRCodeCard uploadUrl={uploadUrl} coupleNames={config.coupleNames} />
       </section>
     </div>
   );
