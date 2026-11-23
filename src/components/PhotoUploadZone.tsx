@@ -370,43 +370,49 @@ export default function PhotoUploadZone({
               className="flex items-center gap-3 pt-2"
               onClick={(e) => e.stopPropagation()}
             >
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-gold-200 text-xs font-medium text-stoneDark hover:bg-gold-50 shadow-sm transition-all"
+              <label
+                htmlFor="wedding-file-upload-input"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-gold-200 text-xs font-medium text-stoneDark hover:bg-gold-50 shadow-sm transition-all cursor-pointer active:scale-95 select-none"
               >
                 <ImageIcon className="w-4 h-4 text-gold-600" />
                 Browse Files
-              </button>
+              </label>
 
-              <button
-                type="button"
-                onClick={() => cameraInputRef.current?.click()}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gold-50 border border-gold-300 text-xs font-medium text-gold-800 hover:bg-gold-100 shadow-sm transition-all"
+              <label
+                htmlFor="wedding-camera-upload-input"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gold-50 border border-gold-300 text-xs font-medium text-gold-800 hover:bg-gold-100 shadow-sm transition-all cursor-pointer active:scale-95 select-none"
               >
                 <Camera className="w-4 h-4 text-gold-600" />
                 Take Photo
-              </button>
+              </label>
             </div>
 
             {/* Hidden file inputs */}
             <input
+              id="wedding-file-upload-input"
               ref={fileInputRef}
               type="file"
               multiple
               accept="image/jpeg,image/png,image/webp,video/mp4,video/quicktime"
               className="hidden"
-              onChange={(e) => handleFiles(e.target.files)}
+              onChange={(e) => {
+                handleFiles(e.target.files);
+                e.target.value = '';
+              }}
             />
 
             {/* Dedicated phone camera input with capture attribute */}
             <input
+              id="wedding-camera-upload-input"
               ref={cameraInputRef}
               type="file"
               accept="image/*"
               capture="environment"
               className="hidden"
-              onChange={(e) => handleFiles(e.target.files)}
+              onChange={(e) => {
+                handleFiles(e.target.files);
+                e.target.value = '';
+              }}
             />
           </div>
 
