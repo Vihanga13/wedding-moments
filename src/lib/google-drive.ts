@@ -63,7 +63,8 @@ export async function uploadToGoogleDrive(
   fileName: string,
   mimeType: string,
   buffer: Buffer,
-  folderIdOverride?: string
+  folderIdOverride?: string,
+  description?: string
 ): Promise<{ fileId: string; webViewLink?: string; size: number }> {
   const oauth2Client = getOAuth2Client();
   const drive = google.drive({ version: 'v3', auth: oauth2Client });
@@ -81,13 +82,14 @@ export async function uploadToGoogleDrive(
   const response = await drive.files.create({
     requestBody: {
       name: fileName,
+      description: description || undefined,
       parents: [targetFolderId],
     },
     media: {
       mimeType,
       body: fileStream,
     },
-    fields: 'id, name, webViewLink, size',
+    fields: 'id, name, webViewLink, size, description',
   });
 
   const fileId = response.data.id;

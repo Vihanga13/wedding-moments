@@ -53,7 +53,8 @@ export async function storeOriginalFile(
   buffer: Buffer,
   sanitizedFileName: string,
   mimeType: string,
-  photoId: string
+  photoId: string,
+  description?: string
 ): Promise<StoredFileResult> {
   ensureDirectories();
 
@@ -95,7 +96,13 @@ export async function storeOriginalFile(
 
   if (driveReady) {
     try {
-      const driveRes = await uploadToGoogleDrive(sanitizedFileName, mimeType, buffer);
+      const driveRes = await uploadToGoogleDrive(
+        sanitizedFileName,
+        mimeType,
+        buffer,
+        undefined,
+        description
+      );
       return {
         provider: 'google_drive',
         driveFileId: driveRes.fileId,

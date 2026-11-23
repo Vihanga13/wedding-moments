@@ -14,28 +14,33 @@ export async function GET(req: NextRequest) {
       searchParams.get('uploaderToken')?.trim() ||
       req.headers.get('x-uploader-token')?.trim();
 
-    // If no uploader token is provided, return empty list to protect guest privacy
-    if (!uploaderToken) {
+    const pin = searchParams.get('pin')?.trim() || searchParams.get('passcode')?.trim();
+    const validPins = ['2811', '2026', process.env.COUPLE_PIN].filter(Boolean);
+    const isCouple = !!pin && validPins.includes(pin);
+
+    // If no uploader token is provided and not couple unlocked, return empty list to protect guest privacy
+    if (!isCouple && !uploaderToken) {
       return NextResponse.json({
         photos: [],
         total: 0,
         page: 1,
         limit,
         totalPages: 0,
+        isCouple: false,
       });
     }
 
-    // Guests view only photos they uploaded from their device
+    // Guests view only photos they uploaded from their device; couple views all photos
     const where: any = {
       status: 'APPROVED',
-      uploaderToken,
+      ...(isCouple ? {} : { uploaderToken }),
     };
 
     if (guestSearch) {
-      where.guestName = {
-        contains: guestSearch,
-        mode: 'insensitive',
-      };
+      where.OR = [
+        { guestName: { contains: guestSearch, mode: 'insensitive' } },
+        { guestCaption: { contains: guestSearch, mode: 'insensitive' } },
+      ];
     }
 
     const [total, photos] = await Promise.all([
@@ -70,6 +75,7 @@ export async function GET(req: NextRequest) {
       page,
       limit,
       totalPages,
+      isCouple,
     });
   } catch (error: any) {
     console.error('Error fetching gallery photos:', error);

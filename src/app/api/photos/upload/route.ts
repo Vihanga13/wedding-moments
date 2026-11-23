@@ -123,8 +123,25 @@ export async function POST(req: NextRequest) {
         });
         photoId = photo.id;
 
+        // Build heartfelt description for Google Drive metadata
+        const descParts: string[] = [];
+        if (guestName) descParts.push(`From: ${guestName}`);
+        if (guestCaption) descParts.push(`Wedding Wish: ${guestCaption}`);
+        descParts.push(`Uploaded: ${new Date().toLocaleString()}`);
+        const driveDescription = descParts.join('\n\n');
+
+        const driveFileName = guestName
+          ? `[${guestName.replace(/[^a-zA-Z0-9_\-\s]/g, '').trim()}] ${storageFileName}`
+          : storageFileName;
+
         // Store original to Google Drive or local fallback with Sharp preview generation
-        const stored = await storeOriginalFile(buffer, storageFileName, mimeType, photo.id);
+        const stored = await storeOriginalFile(
+          buffer,
+          driveFileName,
+          mimeType,
+          photo.id,
+          driveDescription
+        );
 
         // Update photo record with dimensions, blur URL, and Drive file ID
         await prisma.photo.update({

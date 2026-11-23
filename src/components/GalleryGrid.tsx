@@ -30,9 +30,32 @@ export default function GalleryGrid() {
   const [searchGuest, setSearchGuest] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
+  // Couple unlock state
+  const [couplePin, setCouplePin] = useState<string>('');
+  const [isCoupleUnlocked, setIsCoupleUnlocked] = useState(false);
+  const [showPinModal, setShowPinModal] = useState(false);
+  const [pinInput, setPinInput] = useState('');
+  const [pinError, setPinError] = useState<string | null>(null);
+
   // Lightbox state
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+
+  // Read saved PIN or URL query parameter on mount
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const urlPin = urlParams.get('pin') || urlParams.get('passcode');
+      const savedPin = localStorage.getItem('wedding_couple_pin');
+      const activePin = urlPin || savedPin;
+      if (activePin) {
+        setCouplePin(activePin);
+        if (urlPin) {
+          localStorage.setItem('wedding_couple_pin', urlPin);
+        }
+      }
+    }
+  }, []);
 
   // Debounce search
   useEffect(() => {
@@ -52,18 +75,25 @@ export default function GalleryGrid() {
         page: String(page),
         limit: '24',
         sort: sortOrder,
-        ...(token ? { uploaderToken: token } : {}),
+        ...(couplePin ? { pin: couplePin } : token ? { uploaderToken: token } : {}),
         ...(debouncedSearch ? { guest: debouncedSearch } : {}),
       });
 
       const res = await fetch(`/api/photos?${params.toString()}`, {
         headers: token ? { 'x-uploader-token': token } : {},
       });
-      if (!res.ok) throw new Error('Failed to load your uploaded photos.');
+      if (!res.ok) throw new Error('Failed to load photos.');
       const data: GalleryResponse = await res.json();
       setPhotos(data.photos);
       setTotalPages(data.totalPages);
       setTotalPhotos(data.total);
+      if (data.isCouple) {
+        setIsCoupleUnlocked(true);
+      } else if (couplePin) {
+        setIsCoupleUnlocked(false);
+        setPinError('Invalid PIN. Please try again.');
+        localStorage.removeItem('wedding_couple_pin');
+      }
     } catch (err: any) {
       console.error('Gallery fetch error:', err);
       setError(err.message || 'Unable to load photo gallery.');
@@ -74,7 +104,23 @@ export default function GalleryGrid() {
 
   useEffect(() => {
     fetchPhotos();
-  }, [page, sortOrder, debouncedSearch]);
+  }, [page, sortOrder, debouncedSearch, couplePin]);
+
+  function handleUnlock(e: React.FormEvent) {
+    e.preventDefault();
+    setPinError(null);
+    if (!pinInput.trim()) return;
+    setCouplePin(pinInput.trim());
+    localStorage.setItem('wedding_couple_pin', pinInput.trim());
+    setShowPinModal(false);
+    setPinInput('');
+  }
+
+  function handleLock() {
+    setCouplePin('');
+    setIsCoupleUnlocked(false);
+    localStorage.removeItem('wedding_couple_pin');
+  }
 
   return (
     <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fade-in">
@@ -83,15 +129,41 @@ export default function GalleryGrid() {
         <div>
           <div className="flex items-center gap-2.5 flex-wrap">
             <h2 className="font-serif-wedding text-3xl sm:text-4xl text-stoneDark font-medium">
-              Your Uploaded Moments
+              {isCoupleUnlocked ? 'All Wedding Moments & Wishes' : 'Your Uploaded Moments'}
             </h2>
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-sans font-medium bg-gold-100/80 text-gold-800 border border-gold-200/60">
-              <Lock className="w-3 h-3 text-gold-700" />
-              Private to this device
-            </span>
+            {isCoupleUnlocked ? (
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-sans font-medium bg-emerald-100/90 text-emerald-800 border border-emerald-300 shadow-sm">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
+                Couple View (All Guests)
+                <button
+                  type="button"
+                  onClick={handleLock}
+                  className="ml-1 text-emerald-700 hover:text-emerald-950 underline text-[10px]"
+                  title="Lock back to device view"
+                >
+                  Lock
+                </button>
+              </span>
+            ) : (
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-sans font-medium bg-gold-100/80 text-gold-800 border border-gold-200/60">
+                  <Lock className="w-3 h-3 text-gold-700" />
+                  Private to this device
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setShowPinModal(true)}
+                  className="text-xs font-sans text-gold-700 hover:text-gold-900 underline font-medium"
+                >
+                  Couple Unlock
+                </button>
+              </div>
+            )}
           </div>
           <p className="font-sans text-xs sm:text-sm text-stoneDark/60 mt-1">
-            {totalPhotos === 0
+            {isCoupleUnlocked
+              ? `Viewing all ${totalPhotos} photos and wedding wishes from all guests.`
+              : totalPhotos === 0
               ? 'Photos you capture and upload from this phone or browser will appear here.'
               : `You have uploaded ${totalPhotos} photo${totalPhotos === 1 ? '' : 's'} to Brunthavan & Shibaani's album.`}
           </p>
@@ -288,6 +360,60 @@ export default function GalleryGrid() {
         onClose={() => setLightboxOpen(false)}
         onNavigate={(newIdx) => setCurrentPhotoIndex(newIdx)}
       />
+
+      {/* PIN Unlock Modal for Couple */}
+      {showPinModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
+          <div className="w-full max-w-sm rounded-3xl bg-white p-6 sm:p-8 shadow-2xl border border-gold-300 space-y-4">
+            <div className="text-center space-y-1">
+              <div className="w-12 h-12 rounded-full bg-gold-100 flex items-center justify-center mx-auto text-gold-700">
+                <Lock className="w-6 h-6" />
+              </div>
+              <h3 className="font-serif-wedding text-2xl font-bold text-stoneDark">
+                Couple Access
+              </h3>
+              <p className="text-xs font-sans text-stoneDark/60">
+                Enter your wedding PIN to view all guest photos and wishes.
+              </p>
+            </div>
+
+            <form onSubmit={handleUnlock} className="space-y-4">
+              <div>
+                <input
+                  type="password"
+                  autoFocus
+                  placeholder="Enter PIN (e.g. 2811)"
+                  value={pinInput}
+                  onChange={(e) => setPinInput(e.target.value)}
+                  className="w-full px-4 py-3 text-center tracking-widest text-lg font-mono rounded-xl border border-gold-300 focus:outline-none focus:ring-2 focus:ring-gold-500 bg-ivory-50/50"
+                />
+                {pinError && (
+                  <p className="text-xs text-rose-600 mt-1.5 text-center">{pinError}</p>
+                )}
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowPinModal(false);
+                    setPinError(null);
+                  }}
+                  className="flex-1 py-2.5 rounded-xl border border-stone-200 text-xs font-medium text-stone-600 hover:bg-stone-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="flex-1 py-2.5 rounded-xl bg-gold-600 text-xs font-medium text-white hover:bg-gold-500 shadow-sm"
+                >
+                  Unlock
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

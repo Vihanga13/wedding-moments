@@ -40,6 +40,7 @@ export interface GalleryResponse {
   page: number;
   limit: number;
   totalPages: number;
+  isCouple?: boolean;
 }
 
 export interface UploadResultItem {
