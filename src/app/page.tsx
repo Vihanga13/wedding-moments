@@ -25,7 +25,7 @@ export default async function HomePage() {
           <span>{config.weddingDate || 'November 28, 2026'}</span>
         </div>
 
-        {/* Wedding Title & Couple Names */}
+        {/* Couple Names */}
         <div className="space-y-4">
           <h1 className="font-script-wedding text-5xl sm:text-7xl lg:text-8xl text-stoneDark font-normal flex flex-col items-center justify-center leading-tight sm:leading-tight">
             <span>Brunthavan</span>
@@ -34,9 +34,6 @@ export default async function HomePage() {
             </span>
             <span>Shibaani Surudisya</span>
           </h1>
-          <p className="font-serif-wedding text-2xl sm:text-3xl tracking-wide text-gold-700 font-medium pt-2">
-            {config.weddingTitle || 'Our Wedding Memories'}
-          </p>
           {config.venue && (
             <p className="font-sans text-xs sm:text-sm text-stoneDark/60 tracking-wider uppercase font-medium">
               {config.venue}
@@ -45,11 +42,27 @@ export default async function HomePage() {
         </div>
 
         {/* Message from the Couple */}
-        <div className="max-w-2xl mx-auto p-6 sm:p-8 rounded-3xl glass-panel-gold border border-gold-200/80 shadow-soft text-center">
-          <p className="font-serif-wedding text-lg sm:text-xl text-stoneDark/90 italic leading-relaxed whitespace-pre-line">
-            {config.welcomeMessage}
-          </p>
-          <div className="mt-6 flex flex-col items-center justify-center text-center space-y-1">
+        <div className="max-w-2xl mx-auto p-6 sm:p-8 rounded-3xl glass-panel-gold border border-gold-200/80 shadow-soft text-center space-y-4">
+          {(() => {
+            const parts = (config.welcomeMessage || '').split('\n\n');
+            const title = parts[0];
+            const body = parts.slice(1);
+            return (
+              <>
+                <h2 className="font-serif-wedding text-2xl sm:text-3xl font-bold text-stoneDark tracking-wide not-italic">
+                  {title}
+                </h2>
+                {body.length > 0 && (
+                  <div className="font-serif-wedding text-lg sm:text-xl text-stoneDark/90 italic leading-relaxed space-y-3">
+                    {body.map((p, i) => (
+                      <p key={i}>{p}</p>
+                    ))}
+                  </div>
+                )}
+              </>
+            );
+          })()}
+          <div className="pt-2 flex flex-col items-center justify-center text-center space-y-1">
             <span className="text-gold-600 font-script-wedding text-3xl">
               With love,
             </span>
