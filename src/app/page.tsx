@@ -27,12 +27,10 @@ export default async function HomePage() {
 
         {/* Couple Names */}
         <div className="space-y-4">
-          <h1 className="font-script-wedding text-5xl sm:text-7xl lg:text-8xl text-stoneDark font-normal flex flex-col items-center justify-center leading-tight sm:leading-tight">
-            <span>Brunthavan</span>
-            <span className="text-3xl sm:text-5xl lg:text-6xl text-gold-600 my-0.5 sm:my-1 font-normal select-none">
-              &amp;
-            </span>
-            <span>Shibaani Surudisya</span>
+          <h1 className="font-script-wedding text-4xl sm:text-6xl md:text-7xl lg:text-8xl text-stoneDark font-normal text-center leading-tight whitespace-nowrap">
+            <span>Bru</span>{' '}
+            <span className="text-gold-600 font-normal select-none">&amp;</span>{' '}
+            <span>Surudhi</span>
           </h1>
           {config.venue && (
             <p className="font-sans text-xs sm:text-sm text-stoneDark/60 tracking-wider uppercase font-medium">
