@@ -7,12 +7,14 @@ interface LiveCameraModalProps {
   isOpen: boolean;
   onClose: () => void;
   onCapture: (file: File) => void;
+  onLaunchNativeCamera?: () => void;
 }
 
 export default function LiveCameraModal({
   isOpen,
   onClose,
   onCapture,
+  onLaunchNativeCamera,
 }: LiveCameraModalProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -187,13 +189,25 @@ export default function LiveCameraModal({
             <div className="p-6 text-center text-rose-300 space-y-3">
               <AlertCircle className="w-10 h-10 mx-auto text-rose-400" />
               <p className="text-sm font-sans">{error}</p>
-              <button
-                type="button"
-                onClick={onClose}
-                className="mt-3 px-4 py-2 rounded-xl bg-white/10 text-xs text-white hover:bg-white/20"
-              >
-                Close & Use File Upload
-              </button>
+              <div className="flex flex-wrap gap-2 justify-center pt-2">
+                {onLaunchNativeCamera && (
+                  <button
+                    type="button"
+                    onClick={onLaunchNativeCamera}
+                    className="px-4 py-2.5 rounded-xl bg-gold-500 text-stoneDark font-medium text-xs hover:bg-gold-400 shadow-md transition-all flex items-center gap-1.5"
+                  >
+                    <Camera className="w-4 h-4" />
+                    Launch Phone Camera App
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="px-4 py-2 rounded-xl bg-white/10 text-xs text-white hover:bg-white/20"
+                >
+                  Close & Use Files
+                </button>
+              </div>
             </div>
           ) : (
             <>
@@ -254,6 +268,19 @@ export default function LiveCameraModal({
                 </div>
               </div>
             </button>
+
+            {/* Launch Native Phone Camera Button */}
+            {onLaunchNativeCamera && (
+              <button
+                type="button"
+                onClick={onLaunchNativeCamera}
+                className="p-3.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all active:scale-95 flex flex-col items-center gap-1"
+                title="Switch to phone's native camera app"
+              >
+                <Camera className="w-5 h-5 text-gold-300" />
+                <span className="text-[10px] text-ivory-200/80">Phone App</span>
+              </button>
+            )}
 
             {/* Cancel Button */}
             <button

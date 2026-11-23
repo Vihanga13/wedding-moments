@@ -27,7 +27,7 @@ export default async function HomePage() {
 
         {/* Couple Names */}
         <div className="space-y-4">
-          <h1 className="font-script-wedding text-5xl min-[375px]:text-6xl sm:text-7xl lg:text-8xl text-stoneDark font-normal text-center leading-tight whitespace-nowrap">
+          <h1 className="font-script-wedding text-[3.5rem] min-[390px]:text-[4.25rem] sm:text-8xl lg:text-9xl text-stoneDark font-normal text-center leading-tight whitespace-nowrap py-1">
             <span>Bru</span>{' '}
             <span className="text-gold-600 font-normal select-none">&amp;</span>{' '}
             <span>Surudhi</span>

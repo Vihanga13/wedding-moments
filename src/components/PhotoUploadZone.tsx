@@ -570,6 +570,10 @@ export default function PhotoUploadZone({
         isOpen={isCameraOpen}
         onClose={() => setIsCameraOpen(false)}
         onCapture={(file) => handleFiles([file])}
+        onLaunchNativeCamera={() => {
+          setIsCameraOpen(false);
+          cameraInputRef.current?.click();
+        }}
       />
     </div>
   );
