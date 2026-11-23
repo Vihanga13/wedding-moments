@@ -51,13 +51,15 @@ export default async function HomePage() {
         </div>
 
         {/* Message from the Couple */}
-        <div className="max-w-2xl mx-auto p-6 sm:p-8 rounded-3xl glass-panel-gold border border-gold-200/80 shadow-soft">
-          <p className="font-serif-wedding text-lg sm:text-xl text-stoneDark/90 italic leading-relaxed">
-            &ldquo;{config.welcomeMessage}&rdquo;
+        <div className="max-w-2xl mx-auto p-6 sm:p-8 rounded-3xl glass-panel-gold border border-gold-200/80 shadow-soft text-center">
+          <p className="font-serif-wedding text-lg sm:text-xl text-stoneDark/90 italic leading-relaxed whitespace-pre-line">
+            {config.welcomeMessage}
           </p>
-          <div className="mt-3 flex items-center justify-center gap-1.5 text-gold-600 font-script-wedding text-2xl">
-            <span>With love,</span>
-            <span className="font-serif-wedding text-base not-italic text-stoneDark font-medium">
+          <div className="mt-6 flex flex-col items-center justify-center text-center space-y-1">
+            <span className="text-gold-600 font-script-wedding text-3xl">
+              With love,
+            </span>
+            <span className="font-serif-wedding text-lg sm:text-xl not-italic text-stoneDark font-medium tracking-wide">
               {config.coupleNames}
             </span>
           </div>
