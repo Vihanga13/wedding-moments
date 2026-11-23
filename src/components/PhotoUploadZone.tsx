@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { UploadApiResponse } from '@/types';
 import { getOrCreateUploaderToken } from '@/lib/uploader-token';
+import LiveCameraModal from './LiveCameraModal';
 
 interface FilePreviewItem {
   id: string;
@@ -47,6 +48,7 @@ export default function PhotoUploadZone({
   const [uploadProgress, setUploadProgress] = useState(0);
   const [uploadResponse, setUploadResponse] = useState<UploadApiResponse | null>(null);
   const [generalError, setGeneralError] = useState<string | null>(null);
+  const [isCameraOpen, setIsCameraOpen] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
@@ -59,7 +61,7 @@ export default function PhotoUploadZone({
     return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
   }
 
-  function handleFiles(files: FileList | null) {
+  function handleFiles(files: FileList | File[] | null) {
     if (!files) return;
     setGeneralError(null);
 
@@ -378,13 +380,14 @@ export default function PhotoUploadZone({
                 Browse Files
               </label>
 
-              <label
-                htmlFor="wedding-camera-upload-input"
+              <button
+                type="button"
+                onClick={() => setIsCameraOpen(true)}
                 className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gold-50 border border-gold-300 text-xs font-medium text-gold-800 hover:bg-gold-100 shadow-sm transition-all cursor-pointer active:scale-95 select-none"
               >
                 <Camera className="w-4 h-4 text-gold-600" />
                 Take Photo
-              </label>
+              </button>
             </div>
 
             {/* Hidden file inputs */}
@@ -562,6 +565,12 @@ export default function PhotoUploadZone({
           </button>
         </div>
       )}
+      {/* Live In-App Camera Viewfinder Modal */}
+      <LiveCameraModal
+        isOpen={isCameraOpen}
+        onClose={() => setIsCameraOpen(false)}
+        onCapture={(file) => handleFiles([file])}
+      />
     </div>
   );
 }
